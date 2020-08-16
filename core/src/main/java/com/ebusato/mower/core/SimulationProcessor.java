@@ -43,7 +43,7 @@ public class SimulationProcessor implements Tasklet, StepExecutionListener {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         simulation.getMovementList().forEach((mowerId, movements) ->
-                CompletableFuture.runAsync(() -> this.executeMovements(mowerId, movements)));
+                CompletableFuture.runAsync(() -> this.executeMovements(mowerId, movements)).join());
         return RepeatStatus.FINISHED;
     }
 
