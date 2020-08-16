@@ -11,6 +11,7 @@
 
     <modules>
         <module>model</module>
+        <module>core</module>
     </modules>
 
     <properties>
@@ -35,6 +36,11 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ebusato</groupId>
+                <artifactId>model</artifactId>
+                <version>${project.parent.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

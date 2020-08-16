@@ -5,12 +5,13 @@ import com.ebusato.mower.model.constants.Orientation;
 import lombok.Data;
 
 import java.awt.Point;
+import java.io.Serializable;
 
 /**
  * Mower representation.
  */
 @Data
-public class Mower {
+public class Mower implements Serializable {
 
     private Point coordinate;
     private Orientation orientation;

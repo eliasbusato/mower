@@ -4,7 +4,7 @@ import com.ebusato.mower.model.constants.Movement;
 import lombok.Data;
 
 import java.awt.Point;
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * Represents the simulation data.
  */
 @Data
-public class Simulation {
+public class Simulation implements Serializable {
 
     private static final AtomicInteger mowerIdGenerator = new AtomicInteger(0);
 
