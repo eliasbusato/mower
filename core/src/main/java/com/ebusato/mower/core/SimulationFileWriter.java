@@ -20,6 +20,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Writes the @{@link Simulation} result in a file
+ */
 @Component
 @Slf4j
 public class SimulationFileWriter implements Tasklet, StepExecutionListener {

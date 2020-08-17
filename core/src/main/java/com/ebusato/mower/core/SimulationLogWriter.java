@@ -14,6 +14,9 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 
+/**
+ * Logs the @{@link Simulation} result.
+ */
 @Component
 @Slf4j
 public class SimulationLogWriter implements Tasklet, StepExecutionListener {

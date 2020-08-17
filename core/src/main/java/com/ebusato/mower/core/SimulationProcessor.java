@@ -24,6 +24,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Executes the @{@link Simulation}
+ */
 @Component
 @Slf4j
 public class SimulationProcessor implements Tasklet, StepExecutionListener {
@@ -43,6 +46,13 @@ public class SimulationProcessor implements Tasklet, StepExecutionListener {
         log.info("simulation initialized.");
     }
 
+    /**
+     * Runs each @{@link Mower} @{@link Movement} list in parallel.
+     * @param contribution contribution
+     * @param chunkContext chunkContext
+     * @return RepeatStatus.FINISHED
+     * @throws InterruptedException if hangs
+     */
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws InterruptedException {
         List<Callable<Object>> tasks = new ArrayList<>();
@@ -72,39 +82,49 @@ public class SimulationProcessor implements Tasklet, StepExecutionListener {
             default:
                 moveForward(mowerId);
         }
-        log.info("mower [{}] movement finished", mowerId);
+        log.debug("mower [{}] movement finished.", mowerId);
     }
 
+    /**
+     * Move @Mower in a synchronous way because of possible collisions and mower positions updates.
+     * @param mowerId id of the mover to be moved
+     */
     private synchronized void moveForward(Integer mowerId) {
         Mower mower = simulation.getMowerList().get(mowerId);
 
         boolean shouldDiscard = false;
         Point currentlyCoordinate = new Point(mower.getCoordinate());
 
-        log.info("moving mower [{}] forward", mower);
         mower.moveForward();
+        log.debug("mower [{}] moved forward. it is now at [{}].", mowerId, mower.getCoordinate());
         if (isCoordinateOutsideSurface(mower.getCoordinate())) {
-            log.warn("coordinate [{}] is outside the surface.", mower.getCoordinate());
+            log.warn("mower [{}] outside the surface at coordinate [{}].", mowerId, mower.getCoordinate());
             shouldDiscard = true;
         }
         if (isCoordinateUnavailable(mower.getCoordinate())) {
-            log.warn("coordinate [{}] is unavailable", mower.getCoordinate());
+            log.warn("mower [{}] is at an unavailable coordinate [{}].", mowerId, mower.getCoordinate());
             shouldDiscard = true;
         }
         if (shouldDiscard) {
-            log.info("reverting mower [{}] movement!", mowerId);
+            log.warn("mower [{}] movement will be reverted.", mowerId);
             mower.moveBackward();
         } else {
-            log.info("mower [{}] moved successfully!", mowerId);
+            log.debug("mower [{}] moved successfully.", mowerId);
             mowersPositions.remove(currentlyCoordinate);
             mowersPositions.put(new Point(mower.getCoordinate()), mowerId);
         }
     }
 
+    /**
+     * Tuns can safely run in parallel
+     * @param mowerId id on the mowel to be turned
+     * @param movement movement
+     */
     private void turn(Integer mowerId, Movement movement) {
         Mower mower = simulation.getMowerList().get(mowerId);
-        log.info("turning mower [{}] to [{}]", mower, movement);
+        log.debug("mower [{}] will [{}]", mowerId, movement);
         mower.turn(movement);
+        log.debug("mower [{}] is now facing [{}]", mowerId, mower.getOrientation());
     }
 
     private boolean isCoordinateUnavailable(Point coordinate) {
