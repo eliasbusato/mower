@@ -1,9 +1,9 @@
 package com.ebusato.mower.batch;
 
 import com.ebusato.mower.core.SimulationFileWriter;
+import com.ebusato.mower.core.SimulationLogWriter;
 import com.ebusato.mower.core.SimulationProcessor;
 import com.ebusato.mower.core.SimulationReader;
-import com.ebusato.mower.core.SimulationLogWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;

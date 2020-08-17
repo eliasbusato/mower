@@ -14,7 +14,6 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.awt.Point;
 import java.util.ArrayList;
