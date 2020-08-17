@@ -1,5 +1,6 @@
-package com.ebusato.mower.core.config;
+package com.ebusato.mower.test;
 
+import com.ebusato.mower.batch.BatchConfiguration;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -8,10 +9,12 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class TestBatchConfig {
+@Import(BatchConfiguration.class)
+public class BatchConfigurationTest {
 
     @Bean
     public JobLauncherTestUtils jobLauncherTestUtils() {

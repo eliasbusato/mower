@@ -12,6 +12,7 @@
     <modules>
         <module>model</module>
         <module>core</module>
+        <module>batch</module>
     </modules>
 
     <properties>
@@ -40,6 +41,11 @@
             <dependency>
                 <groupId>com.ebusato</groupId>
                 <artifactId>model</artifactId>
+                <version>${project.parent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ebusato</groupId>
+                <artifactId>core</artifactId>
                 <version>${project.parent.version}</version>
             </dependency>
         </dependencies>

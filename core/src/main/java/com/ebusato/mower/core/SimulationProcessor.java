@@ -14,12 +14,16 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 @Slf4j
@@ -30,20 +34,23 @@ public class SimulationProcessor implements Tasklet, StepExecutionListener {
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-        ExecutionContext executionContext = stepExecution
-                .getJobExecution()
-                .getExecutionContext();
-        simulation = Simulation.class.cast(
-                executionContext.get(CoreConstants.SIMULATION_CONTEXT_OBJECT_NAME));
+        ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
+        simulation = (Simulation) executionContext.get(CoreConstants.SIMULATION_CONTEXT_OBJECT_NAME);
+        if (simulation == null) {
+            throw new IllegalStateException("simulation could not be retrieve from context");
+        }
         mowersPositions = new HashMap<>();
         simulation.getMowerList().forEach((mowerId, mower) -> mowersPositions.put(new Point(mower.getCoordinate()), mowerId));
         log.info("simulation initialized.");
     }
 
     @Override
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws InterruptedException {
+        List<Callable<Object>> tasks = new ArrayList<>();
         simulation.getMovementList().forEach((mowerId, movements) ->
-                CompletableFuture.runAsync(() -> this.executeMovements(mowerId, movements)).join());
+                tasks.add(Executors.callable(this.executeMovements(mowerId, movements))));
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        executorService.invokeAll(tasks);
         return RepeatStatus.FINISHED;
     }
 
@@ -53,11 +60,11 @@ public class SimulationProcessor implements Tasklet, StepExecutionListener {
         return ExitStatus.COMPLETED;
     }
 
-    private void executeMovements(Integer mowerId, List<Movement> movements) {
-        movements.forEach(movement -> move(mowerId, movement));
+    private Runnable executeMovements(Integer mowerId, List<Movement> movements) {
+        return () -> movements.forEach(movement -> move(mowerId, movement));
     }
 
-    private synchronized void move(Integer mowerId, Movement movement) {
+    private void move(Integer mowerId, Movement movement) {
         switch (movement) {
             case TURN_LEFT:
             case TURN_RIGHT:
@@ -69,7 +76,7 @@ public class SimulationProcessor implements Tasklet, StepExecutionListener {
         log.info("mower [{}] movement finished", mowerId);
     }
 
-    private void moveForward(Integer mowerId) {
+    private synchronized void moveForward(Integer mowerId) {
         Mower mower = simulation.getMowerList().get(mowerId);
 
         boolean shouldDiscard = false;
@@ -86,10 +93,10 @@ public class SimulationProcessor implements Tasklet, StepExecutionListener {
             shouldDiscard = true;
         }
         if (shouldDiscard) {
-            log.info("reverting mower movement!", mower);
+            log.info("reverting mower [{}] movement!", mowerId);
             mower.moveBackward();
         } else {
-            log.info("mower moved successfully!", mower);
+            log.info("mower [{}] moved successfully!", mowerId);
             mowersPositions.remove(currentlyCoordinate);
             mowersPositions.put(new Point(mower.getCoordinate()), mowerId);
         }

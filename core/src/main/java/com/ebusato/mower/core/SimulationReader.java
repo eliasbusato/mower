@@ -9,6 +9,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -16,11 +17,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@StepScope
 @Slf4j
 public class SimulationReader implements Tasklet, StepExecutionListener {
 
     private Simulation simulation;
     private InputReaderUtil inputReaderUtil;
+
+    @Value("#{jobParameters[inputFile] ?: null}")
+    private String inputFile;
 
     public SimulationReader(@Value("${inputFile:#{null}}") String inputFile) {
         inputReaderUtil = new InputReaderUtil(inputFile);
@@ -28,6 +33,10 @@ public class SimulationReader implements Tasklet, StepExecutionListener {
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
+        if (inputFile != null) {
+            log.info("job parameter found. reloading input reader...");
+            inputReaderUtil = new InputReaderUtil(this.inputFile);
+        }
         log.info("input file is [{}]", inputReaderUtil.getPath());
     }
 

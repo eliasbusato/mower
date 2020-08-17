@@ -1,6 +1,29 @@
 # mower
 Technical Test
 
+## Building Application
+Simple run the following command:
+```
+./mvnw clean package
+```
+
+## Running the simulation
+
+### Maven
+```
+./mvnw spring-boot:run -Dspring-boot.run.arguments=--inputFile=<input_file_absolute_path>
+```
+if you not provide an input file, the simulation will run using default data.
+
+### Java
+```
+java -jar batch/target/batch-1.0-SNAPSHOT.jar --inputFile=<input_file_absolute_path>
+```
+application will **fail** to start if you don't provide input file parameter.
+
+## Simulation Results
+Simulation result will be displayed in console and will also be saved in the file _**simulation_result\_\<timestamp\>.txt**_ on the _**user home directory**_.
+
 ## Goal
 Build a program that implements the following mower specification.
 
