@@ -13,13 +13,13 @@ Simple run the following command:
 ```
 ./mvnw spring-boot:run -Dspring-boot.run.arguments=--inputFile=<input_file_absolute_path>
 ```
-if you not provide an input file, the simulation will run using default data.
+if you do not provide an input file, the simulation will run using **default data**.
 
 ### Java
 ```
 java -jar batch/target/batch-1.0-SNAPSHOT.jar --inputFile=<input_file_absolute_path>
 ```
-application will **fail** to start if you don't provide input file parameter.
+application will **fail** to start if you do not provide input file parameter.
 
 ## Simulation Results
 Simulation result will be displayed in console and will also be saved in the file _**simulation_result\_\<timestamp\>.txt**_ on the _**user home directory**_.
